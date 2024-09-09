@@ -1,15 +1,15 @@
 # Create virtual network
 resource "azurerm_virtual_network" "my_terraform_network" {
-  name                = "myVnet-snipe-it"
+  name                = "Vnet-snipe-it"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
 }
 
 
 # Create subnet
 resource "azurerm_subnet" "my_terraform_subnet" {
-  name                 = "mySubnet-snipe-it"
+  name                 = "Subnet-snipe-it"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.my_terraform_network.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -17,7 +17,7 @@ resource "azurerm_subnet" "my_terraform_subnet" {
 
 # Create public IPs
 resource "azurerm_public_ip" "my_terraform_public_ip" {
-  name                = "myPublicIP-snipe-it"
+  name                = "PublicIP-snipe-it"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   allocation_method   = "Dynamic"
@@ -25,7 +25,7 @@ resource "azurerm_public_ip" "my_terraform_public_ip" {
 
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "my_terraform_nsg" {
-  name                = "myNetworkSecurityGroup-snipe-it"
+  name                = "NetworkSecurityGroup-snipe-it"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
 
@@ -42,7 +42,7 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
   }
   security_rule {
     name                       = "HTTP"
-    priority                   = 1001
+    priority                   = 1021
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -53,7 +53,7 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
   }
   security_rule {
     name                       = "HTTPS"
-    priority                   = 1001
+    priority                   = 1031
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -66,12 +66,12 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
 
 # Create network interface
 resource "azurerm_network_interface" "my_terraform_nic" {
-  name                = "myNIC-snipe-it"
+  name                = "NIC-snipe-it"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
 
   ip_configuration {
-    name                          = "my_nic_configuration-snipe-it"
+    name                          = "nic_configuration-snipe-it"
     subnet_id                     = azurerm_subnet.my_terraform_subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip.id
@@ -86,7 +86,7 @@ resource "azurerm_network_interface_security_group_association" "example" {
 
 # Create storage account for boot diagnostics
 resource "azurerm_storage_account" "my_storage_account" {
-  name                     = "stsnipeit"
+  name                     = "storageaccountsnipeit"
   location                 = var.resource_group_location
   resource_group_name      = var.resource_group_name
   account_tier             = "Standard"
@@ -102,15 +102,15 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   size                  = "Standard_B1s"
 
   os_disk {
-    name                 = "myOsDisk"
+    name                 = "snipeitDisk"
     caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "24_04-lts-gen2"
+    sku       = "22_04-lts-gen2"
     version   = "latest"
   }
 
@@ -129,9 +129,9 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
 
 terraform {
   backend "azurerm" {
-    resource_group_name = "rg-snipe-it"
-    storage_account_name = "stsnipeit"
-    container_name = "c-snipe-it"
+    resource_group_name = "rg-snipeit-prod-gwc-001"
+    storage_account_name = "statesnipeit"
+    container_name = "c-terraform-state"
     key = "prod.terraform.tfstate"
   }
 

@@ -10,13 +10,11 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~>3.115"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~>3.6.2"
-    }
   }
 }
 
 provider "azurerm" {
   features {}
+  skip_provider_registration = true
 }
+ 
