@@ -6,7 +6,6 @@ resource "azurerm_virtual_network" "my_terraform_network" {
   resource_group_name = var.resource_group_name
 }
 
-
 # Create subnet
 resource "azurerm_subnet" "my_terraform_subnet" {
   name                 = "Subnet-snipe-it"
@@ -51,17 +50,6 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  security_rule {
-    name                       = "HTTPS"
-    priority                   = 1031
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
 }
 
 # Create network interface
@@ -82,15 +70,6 @@ resource "azurerm_network_interface" "my_terraform_nic" {
 resource "azurerm_network_interface_security_group_association" "example" {
   network_interface_id      = azurerm_network_interface.my_terraform_nic.id
   network_security_group_id = azurerm_network_security_group.my_terraform_nsg.id
-}
-
-# Create storage account for boot diagnostics
-resource "azurerm_storage_account" "my_storage_account" {
-  name                     = "storageaccountsnipeit"
-  location                 = var.resource_group_location
-  resource_group_name      = var.resource_group_name
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
 }
 
 # Create virtual machine
@@ -121,11 +100,8 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     username   = var.username
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWQYqmcwFST7WkPUW3gne+tFepfz1YPy8dtsq+bVO6yVyl78kHsdhEQyg6et4j5gV4I/C5OMviO1Jaf4N0lJnjpHk7/veQSd/1+4gea/vo8aA3fAzXnsrdCfFY+5txfvKdPzqporuPRJuYQJ2cItZ71h6zB9GmHc7Ct24fcA8FtlB5BjOfslCuhG/TymbCAzeeryYvxXH0O/HAMQXBvEvVo0ZEGct18LMrivtZnydfpaVeyT+OjOFvuKgaFEHuvUi2D4hVrnOt26zgPgr1gnZeoO4RLHt8gV5PmXeUnrxjXI35zpZS+TN/NoupEGm3xVtd7eTO0W6jPMcCKLFk0WDbR2OFdChdDPmn+gnEHkLbji20N5s6+yk/vzgXSn/I+Bs3KIKkvdcz7EYyw5sGBftBXWSJ2yuMZFVa1peee5k8kfXYpo2zkzIBIJ0iXP7i7d0w3eiafcxD1DnCDdBE0FNz9552xHTGSvevuSG9gwh179eILJycrM0+w2B4ivOPVDE= annemarieschmidt@Annemaries-MacBook-Pro.local"
   }
-
-  boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
-  }
 }
+
 
 terraform {
   backend "azurerm" {
